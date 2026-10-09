@@ -1,9 +1,13 @@
-import ru from '../locales/ru.json';
-import tt from '../locales/tt.json';
 import { bus } from './events';
 
 type Dict = Record<string, string>;
-const dicts: Record<'ru' | 'tt', Dict> = { ru: ru as Dict, tt: tt as Dict };
+// All src/locales/<lang>/*.json files are merged; each module owns its own file.
+const files = import.meta.glob<Dict>('../locales/*/*.json', { eager: true, import: 'default' });
+const dicts: Record<'ru' | 'tt', Dict> = { ru: {}, tt: {} };
+for (const [path, d] of Object.entries(files)) {
+  const lang = path.split('/').at(-2) as 'ru' | 'tt';
+  if (dicts[lang]) Object.assign(dicts[lang], d);
+}
 let lang: 'ru' | 'tt' = (() => {
   try { return (localStorage.getItem('lang') as 'ru' | 'tt') || 'ru'; } catch { return 'ru'; }
 })();
