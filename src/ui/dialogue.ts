@@ -10,6 +10,7 @@ import { DialogueSession, checkLabel, type DialogueAction } from '../systems/dia
 import { checkQuestTriggers } from '../systems/quests';
 import { DIALOGUES } from '../data/dialogues';
 import { RAIDER_GROUP } from '../data/npcs';
+import { VAULT_SECURITY, vaultOnDeath } from '../data/dialogues/vault/hooks';
 import './content.css';
 
 // Talking head as data URL from the Phaser texture manager (works for loaded and generated textures).
@@ -22,8 +23,8 @@ export function portraitUrl(world: WorldScene, key?: string): string {
   return portraitCache.get(key)!;
 }
 
-function setGroupHostile(world: WorldScene) {
-  for (const id of RAIDER_GROUP) {
+function setGroupHostile(world: WorldScene, group = RAIDER_GROUP) {
+  for (const id of group) {
     const a = world.actors.get(id);
     if (a && !a.dead && !a.hostile) { a.hostile = true; world.persistNpc(a); }
   }
@@ -31,6 +32,7 @@ function setGroupHostile(world: WorldScene) {
 
 function startFight(world: WorldScene, npc: Actor) {
   if (RAIDER_GROUP.includes(npc.id)) setGroupHostile(world);
+  else if (VAULT_SECURITY.includes(npc.id)) setGroupHostile(world, VAULT_SECURITY);
   else if (!npc.hostile) { npc.hostile = true; if (npc.ai === 'idle' || npc.ai === 'coward') npc.ai = 'aggressive'; world.persistNpc(npc); }
   changed();
   bus.emit('combatStart');
@@ -120,12 +122,14 @@ export function mountDialogue(world: WorldScene) {
   offs.push(bus.on('stateChanged', () => {
     // Provoking one raider provokes the camp.
     if (RAIDER_GROUP.some(id => { const a = world.actors.get(id); return a && !a.dead && a.hostile; })) setGroupHostile(world);
+    if (VAULT_SECURITY.some(id => { const a = world.actors.get(id); return a && !a.dead && a.hostile; })) setGroupHostile(world, VAULT_SECURITY);
     if (checkQuestTriggers()) changed();
     forcedTalk(world);
   }));
   offs.push(bus.on('actorDied', a => {
     if (a.id === 'badri') game.flags.badri_dead = true;
     if (RAIDER_GROUP.includes(a.id)) setGroupHostile(world);
+    vaultOnDeath(a.id);
   }));
   // Looting the raider chest under their noses: Sneak roll, failure starts a fight.
   offs.push(bus.on('openContainer', ({ id }) => {
@@ -137,7 +141,10 @@ export function mountDialogue(world: WorldScene) {
     log(t('world.badri.caught'));
     setTimeout(() => { closeModal(); startFight(world, watchers[0]!); }, 0);
   }));
-  const onReq = (target: Actor) => { if (RAIDER_GROUP.includes(target.id)) setGroupHostile(world); };
+  const onReq = (target: Actor) => {
+    if (RAIDER_GROUP.includes(target.id)) setGroupHostile(world);
+    if (VAULT_SECURITY.includes(target.id)) setGroupHostile(world, VAULT_SECURITY);
+  };
   world.events.on('attackRequest', onReq);
   offs.push(() => world.events.off('attackRequest', onReq));
 }

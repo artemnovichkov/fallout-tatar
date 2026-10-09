@@ -10,8 +10,10 @@ import { questStage, questDone, checkQuestTriggers, journal } from '../src/syste
 import { hasItem, containerHolder } from '../src/systems/inventory';
 import { OBJECTS, TILES, CHARACTERS, PORTRAITS, ICONS } from '../src/systems/assets';
 import { INTRO_SLIDES } from '../src/ui/intro';
-import ru from '../src/locales/ru/dialogue.json';
-import tt from '../src/locales/tt/dialogue.json';
+// Dialogue texts live in several locale files (dialogue.json, vault.json, kazan2.json...): merge per language.
+const localeFiles = import.meta.glob<Record<string, string>>('../src/locales/*/*.json', { eager: true, import: 'default' });
+const merged = (lang: string): Record<string, string> => Object.assign({}, ...Object.entries(localeFiles).filter(([p]) => p.includes(`/${lang}/`)).map(([, d]) => d));
+const ru = merged('ru'), tt = merged('tt');
 import { setLang } from '../src/systems/i18n';
 
 describe('assets', () => {

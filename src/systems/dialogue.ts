@@ -20,9 +20,13 @@ export interface Cond {
   questNew?: string;                              // quest not started
   questDone?: string;
   npcHas?: string;                                // talking NPC carries item
+  // kazan2 additions
+  notQuestDone?: string;                          // quest not completed (new or active)
+  any?: Cond[];                                   // OR: at least one sub-condition holds
+  counter?: string; atLeast?: number; below?: number; // numeric flag (default 0) >= atLeast / < below
 }
 
-export interface Check { skill?: SkillId; stat?: Special; min: number }
+export interface Check { skill?: SkillId; stat?: Special; stats?: Special[]; min: number } // stats: summed SPECIAL
 
 export type Effect =
   | { do: 'flag'; key: string; value?: number | boolean | string }
@@ -35,7 +39,11 @@ export type Effect =
   | { do: 'heal'; n: number }
   | { do: 'log'; key: string }
   | { do: 'combat' }
-  | { do: 'barter' };
+  | { do: 'barter' }
+  // kazan2 additions
+  | { do: 'inc'; key: string; n?: number }        // numeric flag += n (default 1)
+  | { do: 'hurt'; n: number }                     // player loses HP, never below 1
+  | { do: 'stock'; item: string; count?: number };// adds item to talking NPC's inventory (trader stock)
 
 export interface DOption {
   text: string;
@@ -83,18 +91,27 @@ export function checkCond(c: Cond, { game, npc }: Ctx): boolean {
   if (c.questNew !== undefined && game.quests[c.questNew]) return false;
   if (c.questDone !== undefined && !game.quests[c.questDone]?.done) return false;
   if (c.npcHas !== undefined && !hasItem(npc, c.npcHas)) return false;
+  if (c.notQuestDone !== undefined && game.quests[c.notQuestDone]?.done) return false;
+  if (c.any !== undefined && !c.any.some(sub => checkCond(sub, { game, npc }))) return false;
+  if (c.counter !== undefined) {
+    const v = Number(game.flags[c.counter] ?? 0);
+    if (c.atLeast !== undefined && v < c.atLeast) return false;
+    if (c.below !== undefined && v >= c.below) return false;
+  }
   return true;
 }
 export const allConds = (cs: Cond[] | undefined, ctx: Ctx) => !cs || cs.every(c => checkCond(c, ctx));
 
 export function passCheck(ch: Check, game: GameState): boolean {
   const p = game.player;
-  const v = ch.skill ? p.skills[ch.skill] : ch.stat ? p.special[ch.stat] : 0;
+  const v = ch.skill ? p.skills[ch.skill] : ch.stat ? p.special[ch.stat]
+    : ch.stats ? ch.stats.reduce((n, st) => n + p.special[st], 0) : 0;
   return v >= ch.min;
 }
 // "[Красноречие 30]" / "[Интеллект 7]"
 export const checkLabel = (ch: Check) =>
-  `[${t(ch.skill ? `check.skill.${ch.skill}` : `check.stat.${ch.stat}`)} ${ch.min}]`;
+  `[${ch.stats && !ch.skill && !ch.stat ? ch.stats.map(st => t(`check.stat.${st}`)).join('+')
+    : t(ch.skill ? `check.skill.${ch.skill}` : `check.stat.${ch.stat}`)} ${ch.min}]`;
 
 // ---------------------------------------------------------------- effects
 export function applyEffect(e: Effect, ctx: Ctx, actions: DialogueAction[]) {
@@ -127,6 +144,9 @@ export function applyEffect(e: Effect, ctx: Ctx, actions: DialogueAction[]) {
     case 'heal': p.hp = Math.min(p.maxHp, p.hp + e.n); break;
     case 'log': log(t(e.key)); break;
     case 'combat': case 'barter': actions.push(e.do); break;
+    case 'inc': game.flags[e.key] = Number(game.flags[e.key] ?? 0) + (e.n ?? 1); break;
+    case 'hurt': p.hp = Math.max(1, p.hp - e.n); break;
+    case 'stock': addItem(npc, e.item, e.count ?? 1); break;
   }
 }
 

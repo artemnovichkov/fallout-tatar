@@ -214,8 +214,10 @@ export function tryUnlock(id: string, a: Actor = game.player, roll: () => number
 // ---------- barter ----------
 const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
 // FO2-ish: trader marks up by base 25% plus skill gap; buys at ~60% adjusted by skill gap.
+// Quest-earned discount: numeric flag `discount:<npcId>` (e.g. 0.15) lowers the trader's markup.
+export const traderDiscount = (trader: Actor) => Number(game.flags[`discount:${trader.id}`] ?? 0) || 0;
 export function buyFactor(player: Actor, trader: Actor) {
-  return clamp(1.25 + (trader.skills.barter - player.skills.barter) / 100, 1.05, 2.5);
+  return clamp(1.25 + (trader.skills.barter - player.skills.barter) / 100 - traderDiscount(trader), 1.05, 2.5);
 }
 export function sellFactor(player: Actor, trader: Actor) {
   return clamp(0.6 + (player.skills.barter - trader.skills.barter) / 200, 0.25, 0.9);

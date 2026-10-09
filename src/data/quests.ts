@@ -1,7 +1,11 @@
 import { VAULT_QUESTS } from './quests_vault';
 import { KAZAN2_QUESTS } from './quests_kazan2';
 // Quest definitions. Journal texts: quest.<id>.s<stage>, quest.<id>.done[.<method>].
-export interface QuestDef { id: string; nameKey: string; stages: number[] }
+export interface QuestDef {
+  id: string; nameKey: string; stages: number[];
+  // World-state stage changes (item pickups, deaths); run by checkQuestTriggers with its setStage (avoids import cycles). true = changed.
+  trigger?: (setStage: (id: string, stage: number) => void) => boolean;
+}
 
 export const QUESTS: Record<string, QuestDef> = {
   ...VAULT_QUESTS,

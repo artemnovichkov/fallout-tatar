@@ -23,7 +23,7 @@ export const RELOAD_AP = 2;
 export const COMBAT_RADIUS = 15;
 export const END_COMBAT_RADIUS = 10;
 export const CRIT_COUNT = 6;
-export const XP_FOR: Record<string, number> = { raider: 50, ghoul: 75, guard: 100, trader: 25, elder: 25 };
+export const XP_FOR: Record<string, number> = { raider: 50, ghoul: 75, guard: 100, trader: 25, elder: 25, rat: 20, shurale: 200, robot: 120, overseer: 100, dweller: 40, settler: 40 };
 
 export type Rng = () => number;
 export const randInt = (min: number, max: number, rng: Rng = Math.random) => min + Math.floor(rng() * (max - min + 1));

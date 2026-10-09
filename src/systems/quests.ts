@@ -51,5 +51,6 @@ export function checkQuestTriggers(): boolean {
     setStage('kazan', 30); ch = true;
   }
   if (questStage('holotape') === 10 && hasItem(p, 'holotape')) { setStage('holotape', 20); ch = true; }
+  for (const q of Object.values(QUESTS)) if (q.trigger?.(setStage)) ch = true;
   return ch;
 }

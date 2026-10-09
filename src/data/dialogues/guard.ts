@@ -12,6 +12,7 @@ export const guard: DialogueDef = {
       options: [
         { text: 'what', next: 'place' },
         { text: 'danger', next: 'danger' },
+        { text: 'k_rumors', next: 'k_rumors' },
         { text: '@dlg.common.bye', next: 'end' },
       ],
     },
@@ -27,6 +28,8 @@ export const guard: DialogueDef = {
         { text: '@dlg.common.bye', next: 'end' },
       ],
     },
-    hero: { options: [{ text: '@dlg.common.bye', next: 'end' }] },
+    hero: { options: [{ text: 'k_rumors', next: 'k_rumors' }, { text: '@dlg.common.bye', next: 'end' }] },
+    // kazan2: rumors pointing to Sabantuy, the Shurale grove and Marat the oilman.
+    k_rumors: { options: [{ text: '@dlg.common.bye', next: 'end' }] },
   },
 };
