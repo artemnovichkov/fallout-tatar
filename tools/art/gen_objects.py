@@ -111,7 +111,7 @@ def wall_mat(kind):
 def obj_wall(kind):
     H = {'stone': 44, 'brick': 46, 'kremlin': 52}[kind]
     prims = hex_prism(0, H, 'wall')
-    r = rng(hash(kind) & 0xffff)
+    r = rng({'stone': 48882, 'brick': 16797}.get(kind, 0))  # fixed seeds (were str-hash based, non-deterministic)
     if kind == 'kremlin':
         for a in range(0, 360, 60):
             for off in (0.0,):

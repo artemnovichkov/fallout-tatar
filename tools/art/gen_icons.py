@@ -369,9 +369,13 @@ ICONS = ['knife', 'pistol', 'sawedoff', 'ammo9', 'shells', 'stimpak', 'echpochma
 
 
 def main():
-    sheet = Image.new('RGBA', (S * len(ICONS), S), (0, 0, 0, 0))
-    for i, k in enumerate(ICONS):
-        sheet.alpha_composite(globals()['i_' + k](), (i * S, 0))
+    import gen_icons_v2  # v2 icons, appended after the original 18 (contract ICONS order)
+    fns = {k: globals()['i_' + k] for k in ICONS}
+    fns.update({k: getattr(gen_icons_v2, 'i_' + k) for k in gen_icons_v2.ICONS_V2})
+    order = ICONS + gen_icons_v2.ICONS_V2
+    sheet = Image.new('RGBA', (S * len(order), S), (0, 0, 0, 0))
+    for i, k in enumerate(order):
+        sheet.alpha_composite(fns[k](), (i * S, 0))
     print('wrote', save(sheet, 'ui', 'icons.png'))
 
 
