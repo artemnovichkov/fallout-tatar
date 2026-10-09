@@ -1,3 +1,4 @@
+import { sfx, type Sfx } from './audio';
 import { acFor } from './stats';
 // FO2-style turn-based combat. Pure rules on top (testable without Phaser), controller below.
 import type { Actor, ItemDef } from './types';
@@ -207,6 +208,7 @@ export class CombatController implements InputOverride {
       fontFamily: 'VT323, monospace', fontSize: '18px', color: '#6cff6c', stroke: '#000', strokeThickness: 3,
     }).setOrigin(0.5, 1).setDepth(100001).setVisible(false);
     this.fx = this.world.add.graphics().setDepth(99999);
+    sfx('alarm');
     log(t('combat.start'));
     for (const a of this.order) a.ap = a.maxAp;
     changed();
@@ -411,6 +413,7 @@ export class CombatController implements InputOverride {
     const wname = t(weaponOf(a).nameKey);
     if (r === 'ok') {
       a.ap -= RELOAD_AP;
+      sfx('reload');
       log(t('combat.reload', { name: nm(a), weapon: wname }));
       this.world.floatText(a.pos, t('combat.reloadFloat'), '#ffd040');
       changed();
@@ -430,14 +433,17 @@ export class CombatController implements InputOverride {
     const roll = rollAttack(att, tgt, los, Math.random, w);
     if (usesAmmo(w) && w.id === att.weapon) { const st = weaponStack(att); if (st) st.loaded = Math.max(0, (st.loaded ?? 0) - 1); }
     changed();
+    sfx(attackSfx(w));
     await world.playAnim(att, 'attack');
     if (!isMelee(w)) this.tracer(att.pos, tgt.pos, roll.hit);
     world.playAnim(att, 'idle');
     if (!roll.hit) {
+      sfx(isMelee(w) ? 'swing' : 'miss', 0.8);
       world.floatText(tgt.pos, t('combat.missFloat'), '#c0c0c0');
       log(t('combat.miss', { att: nm(att), tgt: nm(tgt) }));
     } else {
       tgt.hp -= roll.dmg;
+      sfx('hit');
       world.floatText(tgt.pos, roll.crit ? `${t('combat.critFloat')} -${roll.dmg}` : `-${roll.dmg}`, roll.crit ? '#ffd040' : '#ff5050');
       if (roll.crit) log(t(`combat.crit.${Math.floor(Math.random() * CRIT_COUNT)}`, { att: nm(att), tgt: nm(tgt), dmg: roll.dmg }));
       else log(t('combat.hit', { att: nm(att), tgt: nm(tgt), dmg: roll.dmg }));
@@ -473,6 +479,7 @@ export class CombatController implements InputOverride {
     s?.setTint(0xff3030);
     this.world.time.delayedCall(200, () => s?.clearTint());
     log(t('combat.died', { name: nm(a) }));
+    sfx('death');
     await this.world.playAnim(a, 'death');
     if (s) s.setDepth(toScreen(a.pos).y + 1);
     this.world.persistNpc(a);
@@ -521,3 +528,6 @@ export class CombatController implements InputOverride {
       .setPosition(ph.x, ph.y - 14).setVisible(true);
   }
 }
+
+const attackSfx = (w: ItemDef): Sfx =>
+  w.id === 'sawedoff' ? 'shotgun' : w.id === 'rifle' ? 'rifle' : !isMelee(w) ? 'pistol' : w.skill === 'unarmed' || !w.skill ? 'punch' : 'swing';

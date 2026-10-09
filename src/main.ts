@@ -4,6 +4,9 @@ import { BootScene } from './scenes/BootScene';
 import { MenuScene } from './scenes/MenuScene';
 import { WorldScene } from './scenes/WorldScene';
 import { UIScene } from './scenes/UIScene';
+import { unlockOnGesture } from './systems/audio';
+
+unlockOnGesture();
 
 new Phaser.Game({
   type: Phaser.AUTO,

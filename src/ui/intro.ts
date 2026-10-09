@@ -1,3 +1,4 @@
+import { sfx } from '../systems/audio';
 // New-game intro: typewriter slides on a dark screen. Click = finish line / next slide, Esc = skip all.
 import { el } from './dom';
 import { t } from '../systems/i18n';
@@ -29,6 +30,7 @@ export function playIntro(onDone: () => void) {
     timer = window.setInterval(() => {
       pos++;
       text.textContent = full.slice(0, pos);
+      if (full[pos - 1] !== ' ') sfx('type', 0.6);
       if (!typing()) clearInterval(timer);
     }, slide === 0 ? 70 : 28);
   };

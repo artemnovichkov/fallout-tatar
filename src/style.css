@@ -92,3 +92,6 @@ button { font-family: var(--font); font-size: 20px; cursor: pointer; }
   .hud-stats, .hud-buttons { display: none; }
 }
 .hud-mode { cursor: pointer; }
+.pip-audio { display: flex; align-items: center; gap: 10px; margin: 4px 0; font-size: 20px; }
+.pip-audio span { min-width: 90px; }
+.pip-range { flex: 1; max-width: 260px; accent-color: var(--green); }

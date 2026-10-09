@@ -6,6 +6,7 @@ import { mountBarter } from './barter';
 import { mountCharacter } from './character';
 import { mountDialogue } from './dialogue';
 import { mountPipbuy } from './pipbuy';
+import { mountSound } from './sound';
 
 // Each feature module exports mount(world). Add new ones here.
 export function mountFeatures(_world: WorldScene) {
@@ -16,4 +17,5 @@ export function mountFeatures(_world: WorldScene) {
   mountCharacter(_world);
   mountDialogue(_world);
   mountPipbuy(_world);
+  mountSound(_world);
 }

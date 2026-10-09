@@ -1,3 +1,4 @@
+import { getAudioSettings, setAudio, sfx } from '../systems/audio';
 // Pip-Buy 2000: green CRT wrist terminal. Tabs: Status, Quests, Map, Settings.
 import type { WorldScene } from '../scenes/WorldScene';
 import { el, modal } from './dom';
@@ -131,6 +132,7 @@ export function openPipbuy(world: WorldScene, tab: Tab = 'status') {
     return el('div', { class: 'pip-settings' }, [
       el('div', { class: 'pip-sub' }, [t('pip.lang')]),
       el('div', { class: 'pip-btnrow' }, [langBtn('ru', 'Русский'), langBtn('tt', 'Татарча')]),
+      ...audioControls(),
       el('div', { class: 'pip-btnrow' }, [
         el('button', { onclick: () => { msg.textContent = save() ? t('pip.saved') : '—'; } }, [t('pip.save')]),
         el('button', {
@@ -171,4 +173,24 @@ let off: (() => void) | null = null;
 export function mountPipbuy(world: WorldScene) {
   off?.();
   off = bus.on('openPipbuy', () => openPipbuy(world));
+}
+
+// Music / SFX volume sliders + mute toggle.
+function audioControls(): HTMLElement[] {
+  const a = getAudioSettings();
+  const slider = (label: string, val: number, set: (v: number) => void) => {
+    const input = el('input', { type: 'range', min: 0, max: 100, value: Math.round(val * 100), class: 'pip-range' });
+    input.addEventListener('input', () => set(Number(input.value) / 100));
+    input.addEventListener('change', () => sfx('click'));
+    return el('label', { class: 'pip-audio' }, [el('span', {}, [label]), input]);
+  };
+  const mute = el('input', { type: 'checkbox' });
+  mute.checked = a.muted;
+  mute.addEventListener('change', () => setAudio({ muted: mute.checked }));
+  return [
+    el('div', { class: 'pip-sub' }, [t('audio.header')]),
+    slider(t('audio.music'), a.music, v => setAudio({ music: v })),
+    slider(t('audio.sfx'), a.sfx, v => setAudio({ sfx: v })),
+    el('label', { class: 'pip-audio' }, [mute, el('span', {}, [t('audio.mute')])]),
+  ];
 }

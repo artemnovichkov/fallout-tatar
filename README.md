@@ -7,7 +7,7 @@ Browser prototype of a Fallout 2-style RPG set in post-apocalyptic Tatarstan. He
 ## Controls
 - LMB: act (walk / talk / loot / attack). RMB or click mode label: switch mode (move, attack, use, look).
 - MMB drag: pan camera. Space: recenter (in combat: end turn). R: reload. Enter: end combat.
-- I: inventory, C: character, P: Pip-Buy. 1-9: dialogue options. Esc: close.
+- I: inventory, C: character, P: Pip-Buy. 1-9: dialogue options. Esc: close. M: mute.
 
 ## Dev
 ```sh

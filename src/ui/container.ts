@@ -1,3 +1,4 @@
+import { sfx } from '../systems/audio';
 // Loot window: player inventory <-> container / corpse.
 import type { WorldScene } from '../scenes/WorldScene';
 import type { Actor } from '../systems/types';
@@ -18,7 +19,8 @@ function persist(id: string) {
 export function openContainer(id: string) {
   const p = game.player;
   const lock = tryUnlock(id);
-  if (lock === 'failed' || lock === 'needKey') { changed(); return; }
+  if (lock === 'failed' || lock === 'needKey') { sfx('fail'); changed(); return; }
+  if (lock === 'picked' || lock === 'key') sfx('unlock');
   const box = containerHolder(id, ui.world?.actors);
   if (!box) return;
   const corpse = id.startsWith('corpse:') ? (box as Actor) : null;

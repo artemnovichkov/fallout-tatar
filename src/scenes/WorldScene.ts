@@ -8,6 +8,7 @@ import type { Actor } from '../systems/types';
 import { game, log, changed } from '../systems/state';
 import { bus } from '../systems/events';
 import { t } from '../systems/i18n';
+import { sfx } from '../systems/audio';
 
 export type Mode = 'move' | 'attack' | 'use' | 'look';
 
@@ -154,6 +155,7 @@ export class WorldScene extends Phaser.Scene {
       this.setFacing(a, direction(a.pos, h));
       this.playAnim(a, 'walk');
       a.pos = h;
+      sfx('step', a.id === 'player' ? 0.8 : 0.4);
       const p = toScreen(h);
       await new Promise<void>(res => this.tweens.add({
         targets: s, x: p.x, y: p.y, duration: 170, onUpdate: () => s.setDepth(s.y + 20), onComplete: () => res(),
