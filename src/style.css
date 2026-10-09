@@ -91,3 +91,4 @@ button { font-family: var(--font); font-size: 20px; cursor: pointer; }
   .hud-log { grid-column: 1 / -1; }
   .hud-stats, .hud-buttons { display: none; }
 }
+.hud-mode { cursor: pointer; }

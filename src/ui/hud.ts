@@ -16,7 +16,10 @@ export function mountHud(): HTMLElement {
   weapon.addEventListener('click', () => { cycleWeapon(game.player); changed(); });
   weapon.addEventListener('contextmenu', e => { e.preventDefault(); reload(game.player); changed(); });
   const ap = el('div', { class: 'hud-ap' });
-  const mode = el('div', { class: 'hud-mode' });
+  // Clickable so touch devices (no right button) can switch modes.
+  const modes = ['move', 'attack', 'use', 'look'] as const;
+  let curMode: typeof modes[number] = 'move';
+  const mode = el('div', { class: 'hud-mode', onclick: () => bus.emit('modeChanged', modes[(modes.indexOf(curMode) + 1) % modes.length]) });
   const combatBtns = el('div', { class: 'hud-combat' });
 
   const btn = (label: string, fn: () => void, title = '') => el('button', { class: 'hud-btn', onclick: fn, title }, [label]);
@@ -54,7 +57,7 @@ export function mountHud(): HTMLElement {
   };
   bus.on('stateChanged', refresh);
   bus.on('log', addLog);
-  bus.on('modeChanged', m => { mode.textContent = t(`mode.${m}`); });
+  bus.on('modeChanged', m => { curMode = m; mode.textContent = t(`mode.${m}`); });
   bus.on('langChanged', () => { refresh(); mode.textContent = t('mode.move'); });
   game.log.slice(-20).forEach(addLog);
   mode.textContent = t('mode.move');
