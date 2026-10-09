@@ -1,0 +1,17 @@
+{
+  "menu.title": "FALLOUT: ТАТАРСТАН",
+  "menu.subtitle": "Сугыш... сугыш беркайчан да үзгәрми. Иделдә дә.",
+  "menu.new": "Яңа уен",
+  "menu.continue": "Дәвам итү",
+  "menu.lang": "Тел: Татарча",
+  "char.ravil": "Равил",
+  "hud.unarmed": "Йодрыклар",
+  "mode.move": "Режим: йөрү (уң төймә — алыштыру)",
+  "mode.attack": "Режим: һөҗүм",
+  "mode.use": "Режим: куллану",
+  "mode.look": "Режим: карау",
+  "log.saved": "Уен сакланды.",
+  "look.actor": "Сез күрәсез: {name} ({hp}).",
+  "look.dead": "Бу — {name}. Үлгән.",
+  "map.kazan_ruins": "Казан хәрабәләре"
+}

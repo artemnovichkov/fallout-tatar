@@ -1,0 +1,17 @@
+{
+  "menu.title": "FALLOUT: ТАТАРСТАН",
+  "menu.subtitle": "Война... война никогда не меняется. Даже на Волге.",
+  "menu.new": "Новая игра",
+  "menu.continue": "Продолжить",
+  "menu.lang": "Тел: Русский",
+  "char.ravil": "Равиль",
+  "hud.unarmed": "Кулаки",
+  "mode.move": "Режим: ходьба (ПКМ — сменить)",
+  "mode.attack": "Режим: атака",
+  "mode.use": "Режим: использовать",
+  "mode.look": "Режим: осмотр",
+  "log.saved": "Игра сохранена.",
+  "look.actor": "Вы видите: {name} ({hp}).",
+  "look.dead": "Это {name}. Мёртв.",
+  "map.kazan_ruins": "Руины Казани"
+}

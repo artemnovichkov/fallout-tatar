@@ -1,0 +1,93 @@
+:root {
+  --green: #6cff6c;
+  --green-dim: #2f8a2f;
+  --amber: #ffb84a;
+  --panel: #2b2722;
+  --panel-dark: #1a1714;
+  --copper: #a8703a;
+  --red: #ff4a3a;
+  --font: 'VT323', 'PT Mono', monospace;
+  --hud-h: 132px;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; overflow: hidden; background: #0d0d0b; color: var(--green); font-family: var(--font); }
+#game { position: fixed; inset: 0; }
+#overlay { position: fixed; inset: 0; pointer-events: none; }
+#overlay > * { pointer-events: auto; }
+button { font-family: var(--font); font-size: 20px; cursor: pointer; }
+
+/* CRT effect */
+.crt { position: relative; text-shadow: 0 0 6px rgba(108,255,108,.55); }
+.crt::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background: repeating-linear-gradient(0deg, rgba(0,0,0,.25) 0 1px, transparent 1px 3px);
+}
+
+/* Menu */
+.menu {
+  position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+  background: radial-gradient(ellipse at center, #13220f 0%, #050805 75%);
+}
+.menu h1 { font-size: clamp(42px, 8vw, 96px); margin: 0; letter-spacing: 4px; text-align: center; }
+.menu .subtitle { font-size: 24px; color: var(--green-dim); margin-bottom: 24px; text-align: center; padding: 0 16px; }
+.menu button { min-width: 260px; padding: 8px 20px; background: transparent; color: var(--green); border: 2px solid var(--green-dim); }
+.menu button:hover { background: rgba(108,255,108,.12); border-color: var(--green); }
+
+/* HUD */
+.hud {
+  position: absolute; left: 50%; bottom: 0; transform: translateX(-50%);
+  width: min(100%, 980px); height: var(--hud-h);
+  display: grid; grid-template-columns: 2.2fr .7fr 2fr 1fr; gap: 8px; padding: 8px;
+  background: linear-gradient(#3a342c, var(--panel)); border: 3px solid #4b4238; border-bottom: 0; border-radius: 10px 10px 0 0;
+  box-shadow: 0 -4px 20px rgba(0,0,0,.6);
+}
+.hud-log {
+  background: #050805; border: 2px inset #4b4238; padding: 4px 6px; overflow-y: auto; font-size: 16px; line-height: 1.1;
+  scrollbar-width: thin; scrollbar-color: var(--green-dim) transparent;
+}
+.hud-stats { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 4px 6px; color: var(--amber); }
+.hud-stats label { font-size: 16px; color: #c9b89a; }
+.hud-counter { background: #000; color: var(--amber); font-size: 32px; text-align: center; border: 2px inset #4b4238; letter-spacing: 2px; }
+.hud-counter.small { font-size: 22px; }
+.hud-counter.low { color: var(--red); animation: blink 1s steps(2) infinite; }
+@keyframes blink { 50% { opacity: .4; } }
+.hud-center { display: flex; flex-direction: column; gap: 4px; align-items: stretch; min-width: 0; }
+.hud-weapon {
+  flex: 1; background: #1d1a16; color: var(--amber); border: 2px outset #5a5044; font-size: 18px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.hud-ap { display: flex; gap: 4px; justify-content: center; }
+.lamp { width: 14px; height: 14px; border-radius: 50%; background: #1e3a1e; border: 1px solid #000; }
+.lamp.on { background: var(--green); box-shadow: 0 0 6px var(--green); }
+.hud-combat { display: flex; gap: 4px; justify-content: center; }
+.hud-combat button { flex: 1; font-size: 16px; padding: 2px; background: #5a1e18; color: #ffd2c8; border: 2px outset #7a2e28; }
+.hud-mode { text-align: center; font-size: 15px; color: #c9b89a; }
+.hud-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; align-content: start; }
+.hud-btn { background: #4b4238; color: #e8dcc4; border: 2px outset #6a5e50; font-size: 16px; padding: 2px; }
+.hud-btn:active { border-style: inset; }
+
+/* Modal windows */
+.modal-back { position: absolute; inset: 0 0 var(--hud-h) 0; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,.45); }
+.window {
+  width: min(92vw, 820px); max-height: calc(100vh - var(--hud-h) - 24px); overflow: auto;
+  background: var(--panel-dark); border: 3px solid var(--copper); border-radius: 6px; padding: 14px; color: var(--green);
+  box-shadow: 0 0 0 2px #000, 0 10px 40px rgba(0,0,0,.7);
+}
+.window h2 { margin: 0 0 10px; font-size: 28px; color: var(--amber); border-bottom: 2px solid #3d352c; }
+.window button { background: #2a2520; color: var(--green); border: 2px solid var(--green-dim); padding: 4px 12px; }
+.window button:hover { border-color: var(--green); }
+
+/* Tatar ornament strip (tulip motif) */
+.ornament {
+  height: 10px; margin: 6px 0;
+  background:
+    radial-gradient(circle at 50% 100%, var(--copper) 3px, transparent 4px) 0 0/16px 10px,
+    linear-gradient(var(--copper), var(--copper)) 0 100%/100% 2px no-repeat;
+  opacity: .7;
+}
+
+@media (max-width: 700px) {
+  :root { --hud-h: 170px; }
+  .hud { grid-template-columns: 1fr 1fr; grid-template-rows: 1fr auto; }
+  .hud-log { grid-column: 1 / -1; }
+  .hud-stats, .hud-buttons { display: none; }
+}
