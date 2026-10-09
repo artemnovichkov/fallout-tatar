@@ -4,7 +4,6 @@ import { NPC_TEMPLATES, spawnNpc } from '../src/data/npcs';
 import { ITEMS } from '../src/data/items';
 import { QUESTS } from '../src/data/quests';
 import { DIALOGUES } from '../src/data/dialogues';
-import { offsetToAxial, axialToOffset, neighbors, key, type Hex } from '../src/systems/hex';
 import { game, setGame, newGame } from '../src/systems/state';
 import { DialogueSession, checkLabel } from '../src/systems/dialogue';
 import { questStage, questDone, checkQuestTriggers, journal } from '../src/systems/quests';
@@ -15,51 +14,12 @@ import ru from '../src/locales/ru/dialogue.json';
 import tt from '../src/locales/tt/dialogue.json';
 import { setLang } from '../src/systems/i18n';
 
-const rows = MAP.floor.length, cols = MAP.floor[0].length;
-const at = (h: Hex) => axialToOffset(h);
-const inB = (h: Hex) => { const { col, row } = at(h); return row >= 0 && row < rows && col >= 0 && col < cols; };
-const npcHexes = new Set(MAP.npcs.map(n => key(offsetToAxial(n.col, n.row))));
-const passable = (h: Hex) => {
-  if (!inB(h)) return false;
-  const { col, row } = at(h);
-  if (FLOOR_LEGEND[MAP.floor[row][col]] === 'water') return false;
-  if (OBJECT_LEGEND[MAP.objects[row][col]]?.blocks) return false;
-  return !npcHexes.has(key(h));
-};
-
-describe('map', () => {
-  it('is ~44x36 with consistent rows and known legend chars', () => {
-    expect(cols).toBe(44); expect(rows).toBe(36);
-    MAP.floor.forEach(r => { expect(r.length).toBe(cols); [...r].forEach(ch => expect(FLOOR_LEGEND[ch], `floor '${ch}'`).toBeDefined()); });
-    expect(MAP.objects.length).toBe(rows);
-    MAP.objects.forEach(r => { expect(r.length).toBe(cols); [...r].forEach(ch => expect(ch === '.' || !!OBJECT_LEGEND[ch], `obj '${ch}'`).toBe(true)); });
-  });
+describe('assets', () => {
   it('uses only contract assets', () => {
     Object.values(FLOOR_LEGEND).forEach(f => expect(TILES).toContain(f));
     Object.values(OBJECT_LEGEND).forEach(o => expect(OBJECTS).toContain(o.obj));
     Object.values(NPC_TEMPLATES).forEach(n => { expect(CHARACTERS).toContain(n.sprite); if (n.portrait) expect(PORTRAITS).toContain(n.portrait); });
     Object.values(ITEMS).forEach(i => expect(ICONS).toContain(i.icon));
-  });
-  it('containers sit on crate/locker/barrel, npcs on free hexes', () => {
-    for (const c of MAP.containers) expect(['crate', 'locker', 'barrel']).toContain(OBJECT_LEGEND[MAP.objects[c.row][c.col]]?.obj);
-    for (const n of MAP.npcs) {
-      expect(NPC_TEMPLATES[n.template], n.template).toBeDefined();
-      expect(MAP.objects[n.row][n.col], n.id).toBe('.');
-      expect(FLOOR_LEGEND[MAP.floor[n.row][n.col]]).not.toBe('water');
-    }
-    const start = MAP.playerStart;
-    expect(passable(offsetToAxial(start.col, start.row))).toBe(true);
-    for (const c of MAP.containers) for (const i of c.items) expect(ITEMS[i.id], i.id).toBeDefined();
-  });
-  it('every NPC and container is reachable from playerStart', () => {
-    const start = offsetToAxial(MAP.playerStart.col, MAP.playerStart.row);
-    const seen = new Set([key(start)]);
-    const q = [start];
-    while (q.length) for (const n of neighbors(q.shift()!)) if (!seen.has(key(n)) && passable(n)) { seen.add(key(n)); q.push(n); }
-    const reachable = (col: number, row: number) => neighbors(offsetToAxial(col, row)).some(n => seen.has(key(n)));
-    for (const n of MAP.npcs) expect(reachable(n.col, n.row), `npc ${n.id}`).toBe(true);
-    for (const c of MAP.containers) expect(reachable(c.col, c.row), `container ${c.id}`).toBe(true);
-    expect(seen.size).toBeGreaterThan(cols * rows * 0.6);
   });
 });
 

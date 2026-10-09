@@ -6,4 +6,7 @@ import { trader } from './trader';
 import { guard } from './guard';
 import { ghoul } from './ghoul';
 
-export const DIALOGUES: Record<string, DialogueDef> = { elder, badri, raider, trader, guard, ghoul };
+import { VAULT_DIALOGUES } from './vault';
+import { KAZAN2_DIALOGUES } from './kazan2';
+
+export const DIALOGUES: Record<string, DialogueDef> = { elder, badri, raider, trader, guard, ghoul, ...VAULT_DIALOGUES, ...KAZAN2_DIALOGUES };

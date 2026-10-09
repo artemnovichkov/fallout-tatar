@@ -1,7 +1,7 @@
 // Inventory, equipment, consumables, containers, barter math. Pure-ish: mutates passed objects + `game`, logs via state.log.
 import type { Actor, InvStack, ItemDef } from './types';
 import { ITEMS } from '../data/items';
-import { MAP, type MapContainer } from '../data/map';
+import { MAPS, type MapContainer } from '../data/map';
 import { acFor, carryWeightFor } from './stats';
 import { game, log } from './state';
 import { t } from './i18n';
@@ -168,7 +168,10 @@ export function transfer(from: Holder, to: Holder, id: string, n = 1): number {
 
 // ---------- containers ----------
 export const corpseId = (actorId: string) => `corpse:${actorId}`;
-export const mapContainer = (id: string): MapContainer | undefined => MAP.containers.find(c => c.id === id);
+export const mapContainer = (id: string): MapContainer | undefined => {
+  for (const m of Object.values(MAPS)) { const c = m.containers.find(c => c.id === id); if (c) return c; }
+  return undefined;
+};
 
 // Resolves a container id to a Holder. Corpses use the dead actor's inventory.
 export function containerHolder(id: string, actors?: Map<string, Actor>): Holder | undefined {

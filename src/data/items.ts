@@ -18,6 +18,17 @@ const list: ItemDef[] = [
   { id: 'kazan', type: 'quest', nameKey: 'item.kazan', descKey: 'item.kazan.d', icon: 'kazan', weight: 5, value: 0 },
   { id: 'key_depot', type: 'quest', nameKey: 'item.key_depot', descKey: 'item.key_depot.d', icon: 'key', weight: 0, value: 0 },
   { id: 'holotape', type: 'quest', nameKey: 'item.holotape', descKey: 'item.holotape.d', icon: 'holotape', weight: 0, value: 0 },
+  // v2
+  { id: 'wrench', type: 'weapon', nameKey: 'item.wrench', descKey: 'item.wrench.d', icon: 'wrench', weight: 2, value: 25, damage: [3, 8], apCost: 3, range: 1, skill: 'melee' },
+  { id: 'jumpsuit', type: 'armor', nameKey: 'item.jumpsuit', descKey: 'item.jumpsuit.d', icon: 'jumpsuit', weight: 3, value: 80, ac: 5, dr: 10 },
+  { id: 'kystybyi', type: 'consumable', nameKey: 'item.kystybyi', descKey: 'item.kystybyi.d', icon: 'kystybyi', weight: 0, value: 15, heal: 12 },
+  { id: 'rat_meat', type: 'consumable', nameKey: 'item.rat_meat', descKey: 'item.rat_meat.d', icon: 'rat_meat', weight: 1, value: 4, heal: 5, rads: 6 },
+  { id: 'towel', type: 'misc', nameKey: 'item.towel', descKey: 'item.towel.d', icon: 'towel', weight: 1, value: 60 },
+  { id: 'water_chip', type: 'quest', nameKey: 'item.water_chip', descKey: 'item.water_chip.d', icon: 'water_chip', weight: 1, value: 0 },
+  { id: 'valve', type: 'quest', nameKey: 'item.valve', descKey: 'item.valve.d', icon: 'valve', weight: 2, value: 0 },
+  { id: 'debt_note', type: 'quest', nameKey: 'item.debt_note', descKey: 'item.debt_note.d', icon: 'note', weight: 0, value: 0 },
+  { id: 'keycard', type: 'quest', nameKey: 'item.keycard', descKey: 'item.keycard.d', icon: 'keycard', weight: 0, value: 0 },
+  { id: 'shurale_horn', type: 'quest', nameKey: 'item.shurale_horn', descKey: 'item.shurale_horn.d', icon: 'horn', weight: 1, value: 0 },
 ];
 
 export const ITEMS: Record<string, ItemDef> = Object.fromEntries(list.map(i => [i.id, i]));

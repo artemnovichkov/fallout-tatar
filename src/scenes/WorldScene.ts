@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { Hex, key, toScreen, fromScreen, offsetToAxial, axialToOffset, distance, neighbors, line, direction, eq, HEX_H } from '../systems/hex';
 import { findPath } from '../systems/pathfind';
-import { MAP, FLOOR_LEGEND, OBJECT_LEGEND, MapDef } from '../data/map';
+import { FLOOR_LEGEND, OBJECT_LEGEND, MapDef, MapExit, getMap } from '../data/map';
 import { spawnNpc } from '../data/npcs';
 import { DIR_TO_ROW, CHAR_ORIGIN_Y, AnimName } from '../systems/assets';
 import type { Actor } from '../systems/types';
@@ -9,6 +9,7 @@ import { game, log, changed } from '../systems/state';
 import { bus } from '../systems/events';
 import { t } from '../systems/i18n';
 import { sfx } from '../systems/audio';
+import { mountPerWorld } from '../ui';
 
 export type Mode = 'move' | 'attack' | 'use' | 'look';
 
@@ -19,7 +20,7 @@ export interface InputOverride {
 }
 
 export class WorldScene extends Phaser.Scene {
-  map: MapDef = MAP;
+  map!: MapDef;
   floor = new Map<string, string>();
   objects = new Map<string, { obj: string; blocks: boolean; los: boolean; sprite: Phaser.GameObjects.Image }>();
   actors = new Map<string, Actor>();
@@ -31,20 +32,30 @@ export class WorldScene extends Phaser.Scene {
   private pathG!: Phaser.GameObjects.Graphics;
   private moveToken = 0;
   private dragStart: { x: number; y: number; sx: number; sy: number } | null = null;
+  private modeSub: (() => void) | null = null;
+  private traveling = false;
 
   constructor() { super('World'); }
 
   get player() { return game.player; }
 
   create() {
+    // Scene instance is reused on restart (map travel), so reset all per-map state.
+    this.map = getMap(game.mapId);
+    this.floor = new Map(); this.objects = new Map(); this.actors = new Map(); this.sprites = new Map();
+    this.mode = 'move'; this.inputOverride = null; this.busy = false; this.dragStart = null;
     this.buildMap();
     this.spawnActors();
     this.hoverG = this.add.graphics().setDepth(1);
     this.pathG = this.add.graphics().setDepth(2);
     this.setupCamera();
     this.setupInput();
-    this.scene.launch('UI');
-    bus.on('modeChanged', m => { this.mode = m; });
+    if (!this.scene.isActive('UI')) this.scene.launch('UI');
+    else mountPerWorld(this);
+    if (!this.modeSub) this.modeSub = bus.on('modeChanged', m => { this.mode = m; });
+    bus.emit('modeChanged', 'move');
+    this.cameras.main.fadeIn(300);
+    log(t('log.arrived', { place: t(this.map.nameKey) }));
     changed();
   }
 
@@ -79,6 +90,7 @@ export class WorldScene extends Phaser.Scene {
       this.player.pos = offsetToAxial(st.col, st.row);
       game.flags['started'] = true;
     }
+    if (!this.inBounds(this.player.pos)) this.player.pos = offsetToAxial(st.col, st.row);
     this.addActor(this.player);
     for (const n of this.map.npcs) {
       const a = spawnNpc(n.id, n.template, offsetToAxial(n.col, n.row), n.facing ?? 2);
@@ -257,6 +269,7 @@ export class WorldScene extends Phaser.Scene {
     if (this.mode === 'look') {
       if (target) log(t('look.actor', { name: t(target.nameKey), hp: `${target.hp}/${target.maxHp}` }));
       else if (deadTarget) log(t('look.dead', { name: t(deadTarget.nameKey) }));
+      else if (this.exitAt(h)) log(t(this.exitAt(h)!.labelKey));
       else if (obj) log(t(`look.obj.${obj.obj}`));
       else log(t(`look.floor.${this.floor.get(key(h))}`));
       return;
@@ -281,6 +294,12 @@ export class WorldScene extends Phaser.Scene {
       if (await this.walkAdjacent(h)) bus.emit('openContainer', { id: `corpse:${deadTarget.id}` });
       return;
     }
+    const exit = this.exitAt(h);
+    if (exit) {
+      const ok = obj?.blocks ? await this.walkAdjacent(h) : await this.walkOnto(h);
+      if (ok) this.travel(exit);
+      return;
+    }
     const cont = this.map.containers.find(c => eq(offsetToAxial(c.col, c.row), h));
     if (cont) {
       if (await this.walkAdjacent(h)) bus.emit('openContainer', { id: cont.id });
@@ -293,6 +312,36 @@ export class WorldScene extends Phaser.Scene {
     await this.moveActor(this.player, path, () => this.checkAggro());
     this.showPath(null);
     changed();
+  }
+
+  exitAt(h: Hex): MapExit | undefined {
+    return this.map.exits?.find(e => eq(offsetToAxial(e.col, e.row), h));
+  }
+
+  private async walkOnto(h: Hex): Promise<boolean> {
+    const path = this.pathFor(this.player, h);
+    if (!path) return false;
+    const token = this.moveToken + 1;
+    await this.moveActor(this.player, path, () => this.checkAggro());
+    return token === this.moveToken && eq(this.player.pos, h) && !this.inputOverride;
+  }
+
+  // Move to another map: persist, fade, restart scene with new map.
+  travel(exit: MapExit) {
+    if (this.traveling || this.inputOverride) return;
+    if (exit.requires && !game.flags[exit.requires]) { log(t(exit.lockedKey ?? 'exit.locked')); return; }
+    const target = getMap(exit.to);
+    const sp = target.spawns?.[exit.spawn] ?? target.playerStart;
+    this.traveling = true;
+    for (const a of this.actors.values()) this.persistNpc(a);
+    sfx('open');
+    this.cameras.main.fadeOut(300);
+    this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, () => {
+      game.mapId = target.id;
+      this.player.pos = offsetToAxial(sp.col, sp.row);
+      this.traveling = false;
+      this.scene.restart();
+    });
   }
 
   async walkAdjacent(h: Hex): Promise<boolean> {

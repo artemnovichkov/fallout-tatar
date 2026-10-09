@@ -1,7 +1,9 @@
+import { VAULT_NPCS } from './npcs_vault';
+import { KAZAN2_NPCS } from './npcs_kazan2';
 import type { Actor } from '../systems/types';
 import { baseSkills, maxHpFor, maxApFor, acFor } from '../systems/stats';
 
-type Template = Omit<Actor, 'id' | 'pos' | 'facing' | 'hp' | 'maxHp' | 'ap' | 'maxAp' | 'ac' | 'skills' | 'dead'>;
+export type Template = Omit<Actor, 'id' | 'pos' | 'facing' | 'hp' | 'maxHp' | 'ap' | 'maxAp' | 'ac' | 'skills' | 'dead'>;
 
 const avg = { S: 5, P: 5, E: 5, C: 5, I: 5, A: 5, L: 5 };
 
@@ -10,6 +12,8 @@ const avg = { S: 5, P: 5, E: 5, C: 5, I: 5, A: 5, L: 5 };
 export const RAIDER_GROUP = ['badri', 'raider1', 'raider2', 'raider3'];
 
 export const NPC_TEMPLATES: Record<string, Template> = {
+  ...VAULT_NPCS,
+  ...KAZAN2_NPCS,
   trader: {
     nameKey: 'npc.trader', sprite: 'trader', special: { ...avg, C: 7 }, hostile: false,
     inventory: [

@@ -8,9 +8,9 @@ import { mountDialogue } from './dialogue';
 import { mountPipbuy } from './pipbuy';
 import { mountSound } from './sound';
 
-// Each feature module exports mount(world). Add new ones here.
+// Mounted once per page (UI scene lives across World restarts). Add new ones here.
 export function mountFeatures(_world: WorldScene) {
-  mountCombat(_world);
+  mountPerWorld(_world);
   mountInventory(_world);
   mountContainer(_world);
   mountBarter(_world);
@@ -18,4 +18,9 @@ export function mountFeatures(_world: WorldScene) {
   mountDialogue(_world);
   mountPipbuy(_world);
   mountSound(_world);
+}
+
+// Modules that dispose on World 'shutdown' and must be re-mounted after map travel.
+export function mountPerWorld(world: WorldScene) {
+  mountCombat(world);
 }

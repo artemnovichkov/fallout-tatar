@@ -27,25 +27,37 @@ export const ANIM = {
 export const CHAR_COLS = 15;
 export type AnimName = keyof typeof ANIM;
 
-export const CHARACTERS = ['ravil', 'raider', 'trader', 'elder', 'ghoul', 'guard'] as const;
+export const CHARACTERS = [
+  'ravil', 'raider', 'trader', 'elder', 'ghoul', 'guard',
+  // v2: vault dwellers (blue/yellow '116' jumpsuit), overseer, floating robot helper, giant mutant rat
+  // (small, low to the ground), Shurale (Tatar forest spirit: long fingers, horn, mutated), generic settler.
+  'dweller', 'overseer', 'robot', 'rat', 'shurale', 'settler',
+] as const;
 
 // Floor tiles: public/assets/tiles/<key>.png, size TILE_W x TILE_H (hex-shaped, transparent corners).
 export const TILE_W = 50;
 export const TILE_H = 26;
-export const TILES = ['sand', 'asphalt', 'rubble', 'grass', 'water', 'floor', 'carpet'] as const;
+export const TILES = ['sand', 'asphalt', 'rubble', 'grass', 'water', 'floor', 'carpet', 'metal', 'grate'] as const;
 
 // Objects: public/assets/sprites/obj_<key>.png, any size, origin at bottom-center (0.5, 1) sitting on hex center.
 export const OBJECTS = [
   'wall_stone', 'wall_brick', 'wall_kremlin', 'tower_syuyumbike', 'tree_dead', 'barrel', 'crate',
   'car_wreck', 'vault_door', 'tent', 'campfire', 'derrick', 'lamp_post', 'counter', 'bed', 'locker',
+  // v2: vault interior + Sabantuy pole
+  'wall_vault', 'terminal', 'purifier', 'reactor', 'pipes', 'table', 'shelf', 'desk', 'pole',
 ] as const;
 
 // Portraits: public/assets/portraits/<key>.png, 160x160.
-export const PORTRAITS = ['portrait_ravil', 'portrait_trader', 'portrait_elder', 'portrait_raider', 'portrait_ghoul', 'portrait_guard'] as const;
+export const PORTRAITS = [
+  'portrait_ravil', 'portrait_trader', 'portrait_elder', 'portrait_raider', 'portrait_ghoul', 'portrait_guard',
+  'portrait_overseer', 'portrait_dweller', 'portrait_robot', 'portrait_shurale', 'portrait_settler',
+] as const;
 
 // Item icons: public/assets/ui/icons.png sprite sheet 32x32 frames, frame order = ICONS.
 export const ICON_SIZE = 32;
 export const ICONS = [
   'knife', 'pistol', 'sawedoff', 'ammo9', 'shells', 'stimpak', 'echpochmak', 'ayran', 'chakchak',
   'leather', 'tubeteika', 'caps', 'key', 'holotape', 'kazan', 'junk', 'rifle', 'ammo762',
+  // v2
+  'water_chip', 'valve', 'wrench', 'towel', 'rat_meat', 'jumpsuit', 'kystybyi', 'note', 'keycard', 'horn',
 ] as const;

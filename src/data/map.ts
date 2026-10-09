@@ -1,7 +1,7 @@
 // Map format: rectangular grid in odd-q offset coords (col, row). One char per hex.
 // floor[row][col] -> FLOOR_LEGEND, objects[row][col] -> OBJECT_LEGEND ('.' or ' ' = none).
 export const FLOOR_LEGEND: Record<string, string> = {
-  '.': 'sand', ',': 'asphalt', ':': 'rubble', '"': 'grass', '~': 'water', '_': 'floor', '=': 'carpet',
+  '.': 'sand', ',': 'asphalt', ':': 'rubble', '"': 'grass', '~': 'water', '_': 'floor', '=': 'carpet', '-': 'metal', '+': 'grate',
 };
 
 // blocks: impassable; los: blocks line of sight
@@ -22,6 +22,15 @@ export const OBJECT_LEGEND: Record<string, { obj: string; blocks: boolean; los: 
   'n': { obj: 'counter', blocks: true, los: false },
   'b': { obj: 'bed', blocks: true, los: false },
   'L': { obj: 'locker', blocks: true, los: false },
+  'W': { obj: 'wall_vault', blocks: true, los: true },
+  'M': { obj: 'terminal', blocks: true, los: false },
+  'P': { obj: 'purifier', blocks: true, los: true },
+  'R': { obj: 'reactor', blocks: true, los: true },
+  'p': { obj: 'pipes', blocks: true, los: false },
+  't': { obj: 'table', blocks: true, los: false },
+  's': { obj: 'shelf', blocks: true, los: false },
+  'd': { obj: 'desk', blocks: true, los: false },
+  'I': { obj: 'pole', blocks: true, los: false },
 };
 
 export interface MapNpc { id: string; template: string; col: number; row: number; facing?: number }
@@ -36,119 +45,12 @@ export interface MapDef {
   npcs: MapNpc[];
   containers: MapContainer[]; // must sit on an object hex (crate/locker/barrel)
   labels?: MapLabel[];        // Pip-Buy mini-map captions (i18n keys)
+  spawns?: Record<string, { col: number; row: number }>; // arrival points for exits from other maps
+  exits?: MapExit[];
 }
 
-// "Руины Казани у Кремля": Vault 116 (NW), Kremlin + Syuyumbike (N), Yana Bistä settlement (SW),
-// ghoul's basement by the Volga (E), Bädri's raider camp at the oil derrick (SE).
-export const MAP: MapDef = {
-  id: 'kazan_ruins',
-  nameKey: 'map.kazan_ruins',
-  floor: [
-    ':::::::::::::...:,,..:....".:.:........~~~~~',
-    '::::::::::::..::,,,...:...."..:........~~~~~',
-    '::::::::::::....:,,..::""""::""""::"..""~~~~',
-    '::::::::::::.:..,,:..:":"":""""":"""..""~~~~',
-    '::::::::::::.:..,,,...""""":""""""""....~~~~',
-    '::::::::::::":.",,,..."""":""""":"""....~~~~',
-    '::::::::::::....,,:...:"""""::""""::....~~~~',
-    '::::::::::::....,,,:....:.:.........:...~~~~',
-    '..........:...:.,,,....:.....:........""~~~~',
-    ',,,,,,,,,:,,,:,,,,:,,::,,:,,::,,,,:,,,.~~~~~',
-    ',:,:,,,,,,:,,,,,:,,,,,,,:,,,:,,,,::,,,"~~~~~',
-    ',,,,:,,,:,,,,,,,:,,,,,,:,,:,,,,::,,,,,~~~~~~',
-    '....:...".......,,,::....:.:.......:..~~~~~~',
-    '................,,,.:.......:________.~~~~~~',
-    '...______...."".:,,.....::..._:______"~~~~~~',
-    '...______...."..,,:..........___:____"~~~~~~',
-    '...______.......,,,....:.....____:::_.~~~~~~',
-    '.:.______.......,,,.."..:.::.___:_:__"~~~~~~',
-    '."..............,,:...:...:.:___:____""~~~~~',
-    '............."..,,,.:...:....________..~~~~~',
-    '...............",,,...".........:.:"...~~~~~',
-    '...=======""....,,,.........".........""~~~~',
-    '"..=======......,,:.......".:"."."......~~~~',
-    '...=======:."...,,,........::.........""~~~~',
-    '...=======."....,,:."::::::::,::.::::...~~~~',
-    '...=======....".,,,...:::::,:.:::::::.""~~~~',
-    '..........".....:,,...::::,,.:::::::::..~~~~',
-    '..............:.,,,...:,::::,:,,::,:...~~~~~',
-    '......:........",,,..".,:::::::.:::::..~~~~~',
-    '.:.....:........,,,.:.:,:::::,::,::.:.~~~~~~',
-    '..:..::.........,,,...:::::::.:::::::~~~~~~~',
-    '.:"..:..".:.....:,,...:::::::::::::::~~~~~~~',
-    '.:...........:":,:,:..:::::::,::::::,~~~~~~~',
-    ':...............,,,.:.::,::::::::::,:~~~~~~~',
-    '......."........,,,.:.::::,:.:.:,:.::~~~~~~~',
-    '..............:.,,,.........::".:....~~~~~~~',
-  ],
-  objects: [
-    '###########.................................',
-    '###########..........KKKKKKKKKKKKKKKK.......',
-    '###########..........K..............K.......',
-    '###########..........K..T....S...L..K.......',
-    '#####V#####..........K......................',
-    '##........#..........K......................',
-    '##......L............K.x..........T.K.......',
-    '..T..................KKKK..KKKKK.KKKK.......',
-    '....l........l......l........l..............',
-    '............C...............................',
-    '......C..........................C..........',
-    '........................C...................',
-    '.........l.............l.......l............',
-    'BBBBBBBBBBBBBBB..............BBBBBBBB.......',
-    '..BL....oB....B..C..BBBBBB...Bo..B.bB.......',
-    '..B......B..b.B.....B........B...B..B.......',
-    '..B.nnn..B....B.....B..o.........B..B.......',
-    '..B......B....B.....B......T.B...B..B.......',
-    '..BBBB.BBB...................B.x...LB.......',
-    '.........................B...BBBBBBBB.......',
-    '.x.................l..BBBB..................',
-    '.........Tf...B.............................',
-    '.....A........B.............................',
-    '..............B......TBBBBB...BBBBBB........',
-    '............x.B.C.....B.....................',
-    '...o..........B.......B.....................',
-    '..............B.......B.A..f................',
-    '..T...................B......o..o...........',
-    '...............................D............',
-    '...............l.................o..........',
-    '..........................x.................',
-    '..................C...........o.............',
-    '........................A.........x.........',
-    '....................................T.......',
-    '............................................',
-    '............................................',
-  ],
-  playerStart: { col: 5, row: 6 },
-  npcs: [
-    { id: 'trader', template: 'trader', col: 7, row: 15, facing: 3 },
-    { id: 'elder', template: 'elder', col: 7, row: 23, facing: 3 },
-    { id: 'guard', template: 'guard', col: 12, row: 19, facing: 1 },
-    { id: 'ghoul', template: 'ghoul', col: 34, row: 16, facing: 3 },
-    { id: 'badri', template: 'badri', col: 28, row: 29, facing: 5 },
-    { id: 'raider1', template: 'raider', col: 30, row: 26, facing: 4 },
-    { id: 'raider2', template: 'raider_gun', col: 33, row: 31, facing: 4 },
-    { id: 'raider3', template: 'raider', col: 25, row: 28, facing: 0 },
-  ],
-  containers: [
-    { id: 'vault_locker', col: 8, row: 6, items: [{ id: 'stimpak', count: 1 }, { id: 'ammo9', count: 6 }] },
-    { id: 'kremlin_locker', col: 33, row: 3, items: [{ id: 'holotape', count: 1 }, { id: 'ammo762', count: 5 }] },
-    { id: 'kremlin_crate', col: 23, row: 6, items: [{ id: 'junk', count: 2 }, { id: 'ammo9', count: 4 }] },
-    { id: 'shop_locker', col: 3, row: 14, items: [{ id: 'ayran', count: 1 }, { id: 'ammo9', count: 20 }, { id: 'chakchak', count: 1 }], lockedSkill: 60 },
-    { id: 'ghoul_locker', col: 35, row: 18, items: [{ id: 'rifle', count: 1 }, { id: 'ammo762', count: 10 }], lockedSkill: 45 },
-    { id: 'ghoul_crate', col: 31, row: 18, items: [{ id: 'junk', count: 2 }, { id: 'echpochmak', count: 1 }] },
-    { id: 'bista_crate', col: 12, row: 24, items: [{ id: 'echpochmak', count: 2 }] },
-    { id: 'bista_barrel', col: 3, row: 25, items: [{ id: 'ayran', count: 1 }] },
-    { id: 'raider_chest', col: 26, row: 30, items: [{ id: 'kazan', count: 1 }, { id: 'shells', count: 6 }, { id: 'stimpak', count: 1 }], lockedSkill: 30, keyId: 'key_depot' },
-    { id: 'raider_crate', col: 34, row: 32, items: [{ id: 'tubeteika', count: 1 }, { id: 'ammo9', count: 10 }, { id: 'junk', count: 1 }] },
-    { id: 'raider_barrel', col: 30, row: 31, items: [{ id: 'ammo9', count: 5 }] },
-  ],
-  labels: [
-    { key: 'maplabel.vault', col: 3, row: 2 },
-    { key: 'maplabel.kremlin', col: 27, row: 5 },
-    { key: 'maplabel.bista', col: 5, row: 20 },
-    { key: 'maplabel.ghoul', col: 31, row: 16 },
-    { key: 'maplabel.camp', col: 29, row: 33 },
-    { key: 'maplabel.volga', col: 41, row: 18 },
-  ],
-};
+// Transition hex. May sit on a blocking object (door: player walks adjacent) or on floor (player walks onto it).
+// `requires`: game flag that must be truthy; otherwise `lockedKey` message is logged.
+export interface MapExit { col: number; row: number; to: string; spawn: string; labelKey: string; requires?: string; lockedKey?: string }
+
+export { MAPS, getMap, MAP } from './maps';

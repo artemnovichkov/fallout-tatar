@@ -9,7 +9,7 @@ import { SPECIAL_KEYS } from '../systems/stats';
 import { nextLevelXp } from '../systems/leveling';
 import { journal } from '../systems/quests';
 import { toScreen, offsetToAxial } from '../systems/hex';
-import { MAP, FLOOR_LEGEND, OBJECT_LEGEND } from '../data/map';
+import { getMap, FLOOR_LEGEND, OBJECT_LEGEND } from '../data/map';
 import { portraitUrl } from './dialogue';
 import './content.css';
 
@@ -23,7 +23,7 @@ const FLOOR_COL: Record<string, string> = {
 function drawMap(world: WorldScene, cv: HTMLCanvasElement, blink: boolean) {
   const ctx = cv.getContext('2d');
   if (!ctx) return;
-  const rows = MAP.floor.length, cols = MAP.floor[0].length;
+  const rows = getMap(game.mapId).floor.length, cols = getMap(game.mapId).floor[0].length;
   const br = toScreen(offsetToAxial(cols - 1, rows - 1));
   const pad = 12;
   const sx = (cv.width - pad * 2) / (br.x + 36), sy = (cv.height - pad * 2) / (br.y + 24);
@@ -33,9 +33,9 @@ function drawMap(world: WorldScene, cv: HTMLCanvasElement, blink: boolean) {
   ctx.fillRect(0, 0, cv.width, cv.height);
   for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
     const p = pt(c, r);
-    ctx.fillStyle = FLOOR_COL[FLOOR_LEGEND[MAP.floor[r][c]]] ?? '#1f3d1a';
+    ctx.fillStyle = FLOOR_COL[FLOOR_LEGEND[getMap(game.mapId).floor[r][c]]] ?? '#1f3d1a';
     ctx.fillRect(p.x - cw / 2, p.y - ch / 2, cw, ch);
-    const o = OBJECT_LEGEND[MAP.objects[r]?.[c]];
+    const o = OBJECT_LEGEND[getMap(game.mapId).objects[r]?.[c]];
     if (o) {
       ctx.fillStyle = o.los ? 'rgba(108,255,108,.75)' : 'rgba(108,255,108,.35)';
       ctx.fillRect(p.x - cw / 2 + 1, p.y - ch / 2 + 1, cw - 2, ch - 2);
@@ -44,7 +44,7 @@ function drawMap(world: WorldScene, cv: HTMLCanvasElement, blink: boolean) {
   ctx.font = '14px "PT Mono", monospace';
   ctx.textAlign = 'center';
   ctx.fillStyle = '#b8ffb8';
-  for (const l of MAP.labels ?? []) { const p = pt(l.col, l.row); ctx.fillText(t(l.key), p.x, p.y); }
+  for (const l of getMap(game.mapId).labels ?? []) { const p = pt(l.col, l.row); ctx.fillText(t(l.key), p.x, p.y); }
   const toPx = (h: { q: number; r: number }) => {
     const s = toScreen(h);
     return { x: pad + (s.x + 18) * sx, y: pad + (s.y + 12) * sy };
@@ -122,7 +122,7 @@ export function openPipbuy(world: WorldScene, tab: Tab = 'status') {
     };
     drawMap(world, cv, false);
     raf = requestAnimationFrame(loop);
-    return el('div', {}, [el('div', { class: 'pip-sub' }, [t(MAP.nameKey)]), cv]);
+    return el('div', {}, [el('div', { class: 'pip-sub' }, [t(getMap(game.mapId).nameKey)]), cv]);
   };
 
   const msg = el('div', { class: 'pip-msg' });

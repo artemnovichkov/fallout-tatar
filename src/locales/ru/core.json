@@ -13,5 +13,10 @@
   "log.saved": "Игра сохранена.",
   "look.actor": "Вы видите: {name} ({hp}).",
   "look.dead": "Это {name}. Мёртв.",
-  "map.kazan_ruins": "Руины Казани у Кремля"
+  "map.kazan_ruins": "Руины Казани у Кремля",
+  "log.arrived": "Локация: {place}.",
+  "exit.vault116": "Вход в Убежище 116.",
+  "exit.kazan": "Выход наружу, в руины Казани.",
+  "exit.locked": "Закрыто.",
+  "map.vault116": "Убежище 116"
 }
