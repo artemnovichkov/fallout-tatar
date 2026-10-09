@@ -8,6 +8,12 @@ import { unlockOnGesture } from './systems/audio';
 
 unlockOnGesture();
 
+// Wait for web fonts so Phaser text (damage numbers etc.) doesn't render with a fallback font.
+await Promise.race([
+  Promise.all(['16px Handjet', '16px "Press Start 2P"'].map(f => document.fonts.load(f, 'Аә'))),
+  new Promise(r => setTimeout(r, 2500)),
+]).catch(() => {});
+
 const phaserGame = new Phaser.Game({
   type: Phaser.AUTO,
   parent: 'game',

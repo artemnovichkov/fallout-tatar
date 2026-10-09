@@ -11,7 +11,7 @@ export function playIntro(onDone: () => void) {
   const text = el('div', { class: 'intro-text' });
   const counter = el('div', { class: 'intro-counter' });
   const box = el('div', { class: 'intro crt' }, [
-    el('div', { class: 'intro-frame' }, [text, el('span', { class: 'intro-caret' }, ['█'])]),
+    el('div', { class: 'intro-frame' }, [text, el('span', { class: 'intro-caret' })]),
     counter,
     el('div', { class: 'intro-skip' }, [t('intro.skip')]),
   ]);

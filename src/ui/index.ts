@@ -7,6 +7,7 @@ import { mountCharacter } from './character';
 import { mountDialogue } from './dialogue';
 import { mountPipbuy } from './pipbuy';
 import { mountSound } from './sound';
+import { mountAutosave } from './autosave';
 
 // Mounted once per page (UI scene lives across World restarts). Add new ones here.
 export function mountFeatures(_world: WorldScene) {
@@ -18,6 +19,7 @@ export function mountFeatures(_world: WorldScene) {
   mountDialogue(_world);
   mountPipbuy(_world);
   mountSound(_world);
+  mountAutosave(_world);
 }
 
 // Modules that dispose on World 'shutdown' and must be re-mounted after map travel.

@@ -180,7 +180,7 @@ export class WorldScene extends Phaser.Scene {
 
   floatText(h: Hex, text: string, color = '#ffffff') {
     const p = toScreen(h);
-    const tx = this.add.text(p.x, p.y - 70, text, { fontFamily: 'VT323, monospace', fontSize: '20px', color, stroke: '#000', strokeThickness: 3 })
+    const tx = this.add.text(p.x, p.y - 70, text, { fontFamily: 'Handjet, monospace', fontSize: '20px', color, stroke: '#000', strokeThickness: 3 })
       .setOrigin(0.5).setDepth(100000);
     this.tweens.add({ targets: tx, y: p.y - 110, alpha: 0, duration: 1200, onComplete: () => tx.destroy() });
   }

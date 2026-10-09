@@ -205,7 +205,7 @@ export class CombatController implements InputOverride {
     this.world.inputOverride = this;
     this.world.showPath(null);
     this.label = this.world.add.text(0, 0, '', {
-      fontFamily: 'VT323, monospace', fontSize: '18px', color: '#6cff6c', stroke: '#000', strokeThickness: 3,
+      fontFamily: 'Handjet, monospace', fontSize: '18px', color: '#6cff6c', stroke: '#000', strokeThickness: 3,
     }).setOrigin(0.5, 1).setDepth(100001).setVisible(false);
     this.fx = this.world.add.graphics().setDepth(99999);
     sfx('alarm');

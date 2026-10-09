@@ -63,6 +63,7 @@ export interface QuestState { id: string; stage: number; done: boolean; failed?:
 
 export interface GameState {
   version: 1;
+  savedAt?: number;      // epoch ms of last save
   mapId?: string;        // current location (data/maps); undefined = default map
   lang: 'ru' | 'tt';
   player: Actor;

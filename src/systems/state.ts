@@ -57,7 +57,17 @@ export const setGame = (g: GameState) => { game = g; };
 export const changed = () => bus.emit('stateChanged');
 
 export function save() {
+  game.savedAt = Date.now();
   try { localStorage.setItem(SAVE_KEY, JSON.stringify(game)); return true; } catch { return false; }
+}
+// Summary of the stored save for the menu, without replacing the live game.
+export function saveInfo(): { mapId?: string; savedAt?: number; level: number } | null {
+  try {
+    const raw = localStorage.getItem(SAVE_KEY);
+    if (!raw) return null;
+    const g = JSON.parse(raw) as GameState;
+    return { mapId: g.mapId, savedAt: g.savedAt, level: g.level };
+  } catch { return null; }
 }
 export function hasSave() {
   try { return !!localStorage.getItem(SAVE_KEY); } catch { return false; }

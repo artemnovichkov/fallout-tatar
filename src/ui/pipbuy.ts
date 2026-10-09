@@ -41,7 +41,7 @@ function drawMap(world: WorldScene, cv: HTMLCanvasElement, blink: boolean) {
       ctx.fillRect(p.x - cw / 2 + 1, p.y - ch / 2 + 1, cw - 2, ch - 2);
     }
   }
-  ctx.font = '14px "PT Mono", monospace';
+  ctx.font = '15px Handjet, monospace';
   ctx.textAlign = 'center';
   ctx.fillStyle = '#b8ffb8';
   for (const l of getMap(game.mapId).labels ?? []) { const p = pt(l.col, l.row); ctx.fillText(t(l.key), p.x, p.y); }

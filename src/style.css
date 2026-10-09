@@ -6,11 +6,15 @@
   --panel-dark: #1a1714;
   --copper: #a8703a;
   --red: #ff4a3a;
-  --font: 'VT323', 'PT Mono', monospace;
+  --font: 'Handjet', monospace; /* covers Latin + Cyrillic + Tatar (ә ө ү җ ң һ) */
+  --font-title: 'Press Start 2P', 'Handjet', monospace;
   --hud-h: 132px;
 }
 * { box-sizing: border-box; }
 html, body { margin: 0; height: 100%; overflow: hidden; background: #0d0d0b; color: var(--green); font-family: var(--font); }
+/* Handjet is narrow with a small x-height; scale all UI text up uniformly. */
+body, button, input { font-size-adjust: 0.56; }
+.menu h1 { font-size-adjust: none; }
 #game { position: fixed; inset: 0; }
 #overlay { position: fixed; inset: 0; pointer-events: none; }
 #overlay > * { pointer-events: auto; }
@@ -28,7 +32,7 @@ button { font-family: var(--font); font-size: 20px; cursor: pointer; }
   position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
   background: radial-gradient(ellipse at center, #13220f 0%, #050805 75%);
 }
-.menu h1 { font-size: clamp(42px, 8vw, 96px); margin: 0; letter-spacing: 4px; text-align: center; }
+.menu h1 { font-family: var(--font-title); font-size: clamp(26px, 5vw, 64px); line-height: 1.3; margin: 0 16px; text-align: center; }
 .menu .subtitle { font-size: 24px; color: var(--green-dim); margin-bottom: 24px; text-align: center; padding: 0 16px; }
 .menu button { min-width: 260px; padding: 8px 20px; background: transparent; color: var(--green); border: 2px solid var(--green-dim); }
 .menu button:hover { background: rgba(108,255,108,.12); border-color: var(--green); }
@@ -95,3 +99,10 @@ button { font-family: var(--font); font-size: 20px; cursor: pointer; }
 .pip-audio { display: flex; align-items: center; gap: 10px; margin: 4px 0; font-size: 20px; }
 .pip-audio span { min-width: 90px; }
 .pip-range { flex: 1; max-width: 260px; accent-color: var(--green); }
+.menu-save { display: block; font-size: 16px; color: var(--green-dim); margin-top: 2px; }
+.autosave-badge {
+  position: absolute; top: 12px; right: 16px; padding: 4px 10px; font-size: 18px; color: var(--green);
+  background: rgba(5,8,5,.8); border: 1px solid var(--green-dim); opacity: 0; pointer-events: none !important;
+}
+.autosave-badge.show { animation: autosave 1.8s ease-out; }
+@keyframes autosave { 0%, 60% { opacity: 1; } 100% { opacity: 0; } }
