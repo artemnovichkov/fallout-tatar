@@ -2,11 +2,15 @@ import Phaser from 'phaser';
 import { newGame, setGame, load, hasSave } from '../systems/state';
 import { t, setLang, getLang } from '../systems/i18n';
 import { el } from '../ui/dom';
+import { playIntro } from '../ui/intro';
+import { AUTOLOAD_KEY } from '../ui/pipbuy';
 
 export class MenuScene extends Phaser.Scene {
   constructor() { super('Menu'); }
 
   create() {
+    // Pip-Buy "Load" reloads the page with this flag set.
+    try { if (sessionStorage.getItem(AUTOLOAD_KEY)) { sessionStorage.removeItem(AUTOLOAD_KEY); if (hasSave()) return this.start(true); } } catch { /* ignore */ }
     const root = document.getElementById('overlay')!;
     const render = () => {
       root.innerHTML = '';
@@ -25,6 +29,7 @@ export class MenuScene extends Phaser.Scene {
   private start(fromSave: boolean) {
     if (!(fromSave && load())) setGame(newGame());
     document.getElementById('overlay')!.innerHTML = '';
-    this.scene.start('World');
+    if (fromSave) this.scene.start('World');
+    else playIntro(() => this.scene.start('World'));
   }
 }

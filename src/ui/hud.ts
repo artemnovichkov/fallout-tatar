@@ -1,8 +1,9 @@
 import { el } from './dom';
 import { bus } from '../systems/events';
-import { game, save } from '../systems/state';
+import { game, save, changed } from '../systems/state';
 import { t, setLang, getLang } from '../systems/i18n';
 import { item } from '../data/items';
+import { cycleWeapon, reload } from '../systems/inventory';
 
 // FO2-like bottom panel: log | HP/AC | weapon slot | AP lamps | buttons.
 export function mountHud(): HTMLElement {
@@ -10,6 +11,10 @@ export function mountHud(): HTMLElement {
   const hp = el('div', { class: 'hud-counter' });
   const ac = el('div', { class: 'hud-counter small' });
   const weapon = el('button', { class: 'hud-weapon', title: 'weapon' });
+  // Click: swap to next weapon. Right click / long press: reload.
+  weapon.title = t('hud.weaponTip');
+  weapon.addEventListener('click', () => { cycleWeapon(game.player); changed(); });
+  weapon.addEventListener('contextmenu', e => { e.preventDefault(); reload(game.player); changed(); });
   const ap = el('div', { class: 'hud-ap' });
   const mode = el('div', { class: 'hud-mode' });
   const combatBtns = el('div', { class: 'hud-combat' });

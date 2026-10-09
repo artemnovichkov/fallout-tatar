@@ -13,5 +13,5 @@
   "log.saved": "Игра сохранена.",
   "look.actor": "Вы видите: {name} ({hp}).",
   "look.dead": "Это {name}. Мёртв.",
-  "map.kazan_ruins": "Руины Казани"
+  "map.kazan_ruins": "Руины Казани у Кремля"
 }

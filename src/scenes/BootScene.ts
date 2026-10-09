@@ -22,7 +22,10 @@ export class BootScene extends Phaser.Scene {
   }
 
   create() {
-    for (const k of this.missing) this.textures.exists(k) && this.textures.remove(k);
+    // Vite dev server answers missing files with index.html (200), so also treat absent/invalid textures as missing.
+    const check = (k: string) => { if (!this.textures.exists(k) || this.textures.get(k).key === '__MISSING') this.missing.add(k); };
+    [...CHARACTERS, ...TILES.map(t => `tile_${t}`), ...OBJECTS.map(o => `obj_${o}`), ...PORTRAITS, 'icons'].forEach(check);
+    for (const k of this.missing) if (this.textures.exists(k)) this.textures.remove(k);
     for (const c of CHARACTERS) if (this.missing.has(c)) this.placeholderChar(c);
     for (const t of TILES) if (this.missing.has(`tile_${t}`)) this.placeholderTile(t);
     for (const o of OBJECTS) if (this.missing.has(`obj_${o}`)) this.placeholderObj(o);

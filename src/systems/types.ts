@@ -50,6 +50,8 @@ export interface Actor {
   inventory: InvStack[];
   weapon?: string;       // equipped weapon item id
   armor?: string;
+  dr?: number;           // damage resistance % from armor (set by inventory.equipArmor)
+  caps?: number;         // NPC money (traders)
   hostile: boolean;
   dead: boolean;
   dialogue?: string;     // dialogue id
@@ -72,4 +74,6 @@ export interface GameState {
   npcs: Record<string, Partial<Actor>>; // persistent overrides for map actors (dead, hp, pos, inventory)
   containers: Record<string, InvStack[]>;
   log: string[];
+  skillPoints?: number;  // unspent skill points (leveling)
+  perks?: string[];
 }
